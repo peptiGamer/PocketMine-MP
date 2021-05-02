@@ -34,6 +34,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function floor;
 use function max;
 
@@ -104,9 +105,9 @@ class SnowLayer extends Flowable implements Fallable{
 		return true;
 	}
 
-	public function onRandomTick() : void{
-		if($this->pos->getWorld()->getBlockLightAt($this->pos->x, $this->pos->y, $this->pos->z) >= 12){
-			$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::AIR(), false);
+	public function onRandomTick(World $world, Vector3 $pos) : void{
+		if($world->getBlockLightAt($pos->x, $pos->y, $pos->z) >= 12){
+			$world->setBlock($pos, VanillaBlocks::AIR(), false);
 		}
 	}
 

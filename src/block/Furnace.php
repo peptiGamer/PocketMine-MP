@@ -30,6 +30,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ToolTier;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 
 class Furnace extends Opaque{
 	use FacesOppositePlacingPlayerTrait;
@@ -72,9 +73,9 @@ class Furnace extends Opaque{
 		return $this;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
-			$furnace = $this->pos->getWorld()->getTile($this->pos);
+			$furnace = $world->getTile($blockPos);
 			if($furnace instanceof TileFurnace and $furnace->canOpenWith($item->getCustomName())){
 				$player->setCurrentWindow($furnace->getInventory());
 			}
@@ -83,10 +84,10 @@ class Furnace extends Opaque{
 		return true;
 	}
 
-	public function onScheduledUpdate() : void{
-		$furnace = $this->pos->getWorld()->getTile($this->pos);
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
+		$furnace = $world->getTile($pos);
 		if($furnace instanceof TileFurnace and $furnace->onUpdate()){
-			$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 1); //TODO: check this
+			$world->scheduleDelayedBlockUpdate($pos, 1); //TODO: check this
 		}
 	}
 }

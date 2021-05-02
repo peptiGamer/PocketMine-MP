@@ -31,6 +31,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function lcg_value;
 
 class ItemFrame extends Flowable{
@@ -135,7 +136,7 @@ class ItemFrame extends Flowable{
 		return $this;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($this->framedItem !== null){
 			$this->itemRotation = ($this->itemRotation + 1) % self::ROTATIONS;
 		}elseif(!$item->isNull()){
@@ -144,26 +145,26 @@ class ItemFrame extends Flowable{
 			return true;
 		}
 
-		$this->pos->getWorld()->setBlock($this->pos, $this);
+		$world->setBlock($blockPos, $this);
 
 		return true;
 	}
 
-	public function onAttack(Item $item, int $face, ?Player $player = null) : bool{
+	public function onAttack(World $world, Vector3 $blockPos, Item $item, int $face, ?Player $player = null) : bool{
 		if($this->framedItem === null){
 			return false;
 		}
 		if(lcg_value() <= $this->itemDropChance){
-			$this->pos->getWorld()->dropItem($this->pos->add(0.5, 0.5, 0.5), clone $this->framedItem);
+			$world->dropItem($blockPos->add(0.5, 0.5, 0.5), clone $this->framedItem);
 		}
 		$this->setFramedItem(null);
-		$this->pos->getWorld()->setBlock($this->pos, $this);
+		$world->setBlock($blockPos, $this);
 		return true;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->getSide(Facing::opposite($this->facing))->isSolid()){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 

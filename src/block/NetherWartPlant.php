@@ -30,6 +30,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function mt_rand;
 
 class NetherWartPlant extends Flowable{
@@ -73,9 +74,9 @@ class NetherWartPlant extends Flowable{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::DOWN)->getId() !== BlockLegacyIds::SOUL_SAND){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 
@@ -83,14 +84,14 @@ class NetherWartPlant extends Flowable{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if($this->age < 3 and mt_rand(0, 10) === 0){ //Still growing
 			$block = clone $this;
 			$block->age++;
 			$ev = new BlockGrowEvent($this, $block);
 			$ev->call();
 			if(!$ev->isCancelled()){
-				$this->pos->getWorld()->setBlock($this->pos, $ev->getNewState());
+				$world->setBlock($pos, $ev->getNewState());
 			}
 		}
 	}

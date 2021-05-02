@@ -28,6 +28,7 @@ use pocketmine\item\ToolTier;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 use function mt_rand;
 
 class RedstoneOre extends Opaque{
@@ -65,7 +66,7 @@ class RedstoneOre extends Opaque{
 		return $this->lit ? 9 : 0;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if(!$this->lit){
 			$this->lit = true;
 			$this->pos->getWorld()->setBlock($this->pos, $this); //no return here - this shouldn't prevent block placement
@@ -73,10 +74,10 @@ class RedstoneOre extends Opaque{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->lit){
 			$this->lit = true;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
+			$world->setBlock($pos, $this);
 		}
 	}
 
@@ -84,10 +85,10 @@ class RedstoneOre extends Opaque{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if($this->lit){
 			$this->lit = false;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
+			$world->setBlock($pos, $this);
 		}
 	}
 

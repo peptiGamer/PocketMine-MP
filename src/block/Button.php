@@ -32,6 +32,7 @@ use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\sound\RedstonePowerOffSound;
 use pocketmine\world\sound\RedstonePowerOnSound;
+use pocketmine\world\World;
 
 abstract class Button extends Flowable{
 	use AnyFacingTrait;
@@ -69,22 +70,22 @@ abstract class Button extends Flowable{
 
 	abstract protected function getActivationTime() : int;
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if(!$this->pressed){
 			$this->pressed = true;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
-			$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, $this->getActivationTime());
-			$this->pos->getWorld()->addSound($this->pos->add(0.5, 0.5, 0.5), new RedstonePowerOnSound());
+			$world->setBlock($blockPos, $this);
+			$world->scheduleDelayedBlockUpdate($blockPos, $this->getActivationTime());
+			$world->addSound($blockPos->add(0.5, 0.5, 0.5), new RedstonePowerOnSound());
 		}
 
 		return true;
 	}
 
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 		if($this->pressed){
 			$this->pressed = false;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
-			$this->pos->getWorld()->addSound($this->pos->add(0.5, 0.5, 0.5), new RedstonePowerOffSound());
+			$world->setBlock($pos, $this);
+			$world->addSound($pos->add(0.5, 0.5, 0.5), new RedstonePowerOffSound());
 		}
 	}
 }

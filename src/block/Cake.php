@@ -33,6 +33,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 class Cake extends Transparent implements FoodSource{
 
@@ -87,9 +88,9 @@ class Cake extends Transparent implements FoodSource{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::DOWN)->getId() === BlockLegacyIds::AIR){ //Replace with common break method
-			$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::AIR());
+			$world->setBlock($pos, VanillaBlocks::AIR());
 		}
 	}
 
@@ -97,7 +98,7 @@ class Cake extends Transparent implements FoodSource{
 		return [];
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player !== null){
 			$player->consumeObject($this);
 			return true;

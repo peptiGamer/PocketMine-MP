@@ -31,8 +31,9 @@ use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\Location;
 use pocketmine\entity\object\FallingBlock;
 use pocketmine\math\Facing;
+use pocketmine\math\Vector3;
 use pocketmine\utils\AssumptionFailedError;
-use pocketmine\world\Position;
+use pocketmine\world\World;
 
 /**
  * This trait handles falling behaviour for blocks that need them.
@@ -41,22 +42,19 @@ use pocketmine\world\Position;
  */
 trait FallableTrait{
 
-	abstract protected function getPos() : Position;
-
 	abstract protected function getId() : int;
 
 	abstract protected function getMeta() : int;
 
-	public function onNearbyBlockChange() : void{
-		$pos = $this->getPos();
-		$down = $pos->getWorld()->getBlock($pos->getSide(Facing::DOWN));
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
+		$down = $world->getBlock($pos->getSide(Facing::DOWN));
 		if($down->getId() === BlockLegacyIds::AIR or $down instanceof Liquid or $down instanceof Fire){
-			$pos->getWorld()->setBlock($pos, VanillaBlocks::AIR());
+			$world->setBlock($pos, VanillaBlocks::AIR());
 
 			$block = $this;
 			if(!($block instanceof Block)) throw new AssumptionFailedError(__TRAIT__ . " should only be used by Blocks");
 
-			$fall = new FallingBlock(Location::fromObject($pos->add(0.5, 0, 0.5), $pos->getWorld()), $block);
+			$fall = new FallingBlock(Location::fromObject($pos->add(0.5, 0, 0.5), $world), $block);
 			$fall->spawnToAll();
 		}
 	}

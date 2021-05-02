@@ -30,6 +30,8 @@ use pocketmine\block\utils\HorizontalFacingTrait;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 final class Loom extends Opaque{
 	use FacesOppositePlacingPlayerTrait;
@@ -47,9 +49,9 @@ final class Loom extends Opaque{
 		return 0b11;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player !== null){
-			$player->setCurrentWindow(new LoomInventory($this->pos));
+			$player->setCurrentWindow(new LoomInventory(Position::fromObject($blockPos, $world)));
 			return true;
 		}
 		return false;

@@ -28,6 +28,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 class Flower extends Flowable{
 
@@ -44,9 +45,9 @@ class Flower extends Flowable{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::DOWN)->isTransparent()){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 

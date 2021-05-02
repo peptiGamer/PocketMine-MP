@@ -245,7 +245,7 @@ class Explosion{
 						foreach($this->world->getNearbyEntities(AxisAlignedBB::one()->offset($sideBlock->x, $sideBlock->y, $sideBlock->z)->expand(1, 1, 1)) as $entity){
 							$entity->onNearbyBlockChange();
 						}
-						$ev->getBlock()->onNearbyBlockChange();
+						$ev->getBlock()->onNearbyBlockChange($this->world, $ev->getBlock()->getPos());
 					}
 					$updateBlocks[$index] = true;
 				}

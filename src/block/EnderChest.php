@@ -33,6 +33,8 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class EnderChest extends Transparent{
 	use FacesOppositePlacingPlayerTrait;
@@ -54,11 +56,11 @@ class EnderChest extends Transparent{
 		return [AxisAlignedBB::one()->contract(0.025, 0, 0.025)->trim(Facing::UP, 0.05)];
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
-			$enderChest = $this->pos->getWorld()->getTile($this->pos);
+			$enderChest = $world->getTile($blockPos);
 			if($enderChest instanceof TileEnderChest and $this->getSide(Facing::UP)->isTransparent()){
-				$player->setCurrentWindow(new EnderChestInventory($this->pos, $player->getEnderInventory()));
+				$player->setCurrentWindow(new EnderChestInventory(Position::fromObject($blockPos, $world), $player->getEnderInventory()));
 			}
 		}
 

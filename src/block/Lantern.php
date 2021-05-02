@@ -30,6 +30,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 class Lantern extends Transparent{
 
@@ -86,9 +87,9 @@ class Lantern extends Transparent{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onNearbyBlockChange() : void{
-		if(!$this->canAttachTo($this->pos->getWorld()->getBlock($this->hanging ? $this->pos->up() : $this->pos->down()))){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
+		if(!$this->canAttachTo($world->getBlock($this->hanging ? $pos->up() : $pos->down()))){
+			$world->useBreakOn($pos);
 		}
 	}
 }

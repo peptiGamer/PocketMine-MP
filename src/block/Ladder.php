@@ -33,6 +33,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 class Ladder extends Transparent{
 	use NormalHorizontalFacingInMetadataTrait;
@@ -77,9 +78,9 @@ class Ladder extends Transparent{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->getSide(Facing::opposite($this->facing))->isSolid()){ //Replace with common break method
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 }

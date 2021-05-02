@@ -25,7 +25,9 @@ namespace pocketmine\block;
 
 use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\item\Item;
+use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 
 class Ice extends Transparent{
 
@@ -41,21 +43,21 @@ class Ice extends Transparent{
 		return 0.98;
 	}
 
-	public function onBreak(Item $item, ?Player $player = null) : bool{
+	public function onBreak(World $world, Vector3 $blockPos, Item $item, ?Player $player = null) : bool{
 		if(($player === null or $player->isSurvival()) and !$item->hasEnchantment(VanillaEnchantments::SILK_TOUCH())){
 			$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::WATER());
 			return true;
 		}
-		return parent::onBreak($item, $player);
+		return parent::onBreak($world, $blockPos, $item, $player);
 	}
 
 	public function ticksRandomly() : bool{
 		return true;
 	}
 
-	public function onRandomTick() : void{
-		if($this->pos->getWorld()->getHighestAdjacentBlockLight($this->pos->x, $this->pos->y, $this->pos->z) >= 12){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+	public function onRandomTick(World $world, Vector3 $pos) : void{
+		if($world->getHighestAdjacentBlockLight($pos->x, $pos->y, $pos->z) >= 12){
+			$world->useBreakOn($pos);
 		}
 	}
 

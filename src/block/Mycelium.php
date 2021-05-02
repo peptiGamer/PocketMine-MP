@@ -26,6 +26,8 @@ namespace pocketmine\block;
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\item\Item;
 use pocketmine\math\Facing;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 use function mt_rand;
 
 class Mycelium extends Opaque{
@@ -48,18 +50,18 @@ class Mycelium extends Opaque{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		//TODO: light levels
-		$x = mt_rand($this->pos->x - 1, $this->pos->x + 1);
-		$y = mt_rand($this->pos->y - 2, $this->pos->y + 2);
-		$z = mt_rand($this->pos->z - 1, $this->pos->z + 1);
-		$block = $this->pos->getWorld()->getBlockAt($x, $y, $z);
+		$x = mt_rand($pos->x - 1, $pos->x + 1);
+		$y = mt_rand($pos->y - 2, $pos->y + 2);
+		$z = mt_rand($pos->z - 1, $pos->z + 1);
+		$block = $world->getBlockAt($x, $y, $z);
 		if($block->getId() === BlockLegacyIds::DIRT){
 			if($block->getSide(Facing::UP) instanceof Transparent){
 				$ev = new BlockSpreadEvent($block, $this, VanillaBlocks::MYCELIUM());
 				$ev->call();
 				if(!$ev->isCancelled()){
-					$this->pos->getWorld()->setBlock($block->pos, $ev->getNewState());
+					$world->setBlock($block->pos, $ev->getNewState());
 				}
 			}
 		}

@@ -27,8 +27,10 @@ use pocketmine\block\tile\Sign as TileSign;
 use pocketmine\block\utils\SignText;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\math\AxisAlignedBB;
+use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\World;
 use function array_map;
 use function assert;
 use function strlen;
@@ -72,9 +74,9 @@ abstract class BaseSign extends Transparent{
 
 	abstract protected function getSupportingFace() : int;
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide($this->getSupportingFace())->getId() === BlockLegacyIds::AIR){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 

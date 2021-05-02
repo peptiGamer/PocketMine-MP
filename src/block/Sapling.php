@@ -32,6 +32,7 @@ use pocketmine\player\Player;
 use pocketmine\utils\Random;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\generator\object\Tree;
+use pocketmine\world\World;
 use function mt_rand;
 
 class Sapling extends Flowable{
@@ -75,9 +76,9 @@ class Sapling extends Flowable{
 		return false;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($item instanceof Fertilizer){
-			Tree::growTree($this->pos->getWorld(), $this->pos->x, $this->pos->y, $this->pos->z, new Random(mt_rand()), $this->treeType);
+			Tree::growTree($world, $blockPos->x, $blockPos->y, $blockPos->z, new Random(mt_rand()), $this->treeType);
 
 			$item->pop();
 
@@ -87,9 +88,9 @@ class Sapling extends Flowable{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::DOWN)->isTransparent()){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 
@@ -97,13 +98,13 @@ class Sapling extends Flowable{
 		return true;
 	}
 
-	public function onRandomTick() : void{
-		if($this->pos->getWorld()->getFullLightAt($this->pos->x, $this->pos->y, $this->pos->z) >= 8 and mt_rand(1, 7) === 1){
+	public function onRandomTick(World $world, Vector3 $pos) : void{
+		if($world->getFullLightAt($pos->x, $pos->y, $pos->z) >= 8 and mt_rand(1, 7) === 1){
 			if($this->ready){
-				Tree::growTree($this->pos->getWorld(), $this->pos->x, $this->pos->y, $this->pos->z, new Random(mt_rand()), $this->treeType);
+				Tree::growTree($world, $pos->x, $pos->y, $pos->z, new Random(mt_rand()), $this->treeType);
 			}else{
 				$this->ready = true;
-				$this->pos->getWorld()->setBlock($this->pos, $this);
+				$world->setBlock($pos, $this);
 			}
 		}
 	}

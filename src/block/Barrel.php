@@ -31,6 +31,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function abs;
 
 class Barrel extends Opaque{
@@ -86,9 +87,9 @@ class Barrel extends Opaque{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
-			$barrel = $this->pos->getWorld()->getTile($this->pos);
+			$barrel = $world->getTile($blockPos);
 			if($barrel instanceof TileBarrel){
 				if(!$barrel->canOpenWith($item->getCustomName())){
 					return true;

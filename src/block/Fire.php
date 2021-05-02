@@ -32,6 +32,8 @@ use pocketmine\event\entity\EntityDamageByBlockEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item;
 use pocketmine\math\Facing;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 use function min;
 use function mt_rand;
 
@@ -98,11 +100,11 @@ class Fire extends Flowable{
 		return [];
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->getSide(Facing::DOWN)->isSolid() and !$this->hasAdjacentFlammableBlocks()){
-			$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::AIR());
+			$world->setBlock($pos, VanillaBlocks::AIR());
 		}else{
-			$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, mt_rand(30, 40));
+			$world->scheduleDelayedBlockUpdate($pos, mt_rand(30, 40));
 		}
 	}
 
@@ -110,7 +112,7 @@ class Fire extends Flowable{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		$down = $this->getSide(Facing::DOWN);
 
 		$result = null;
@@ -136,10 +138,10 @@ class Fire extends Flowable{
 		}
 
 		if($result !== null){
-			$this->pos->getWorld()->setBlock($this->pos, $result);
+			$world->setBlock($pos, $result);
 		}
 
-		$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, mt_rand(30, 40));
+		$world->scheduleDelayedBlockUpdate($pos, mt_rand(30, 40));
 
 		if($canSpread){
 			//TODO: raise upper bound for chance in humid biomes
@@ -156,8 +158,8 @@ class Fire extends Flowable{
 		}
 	}
 
-	public function onScheduledUpdate() : void{
-		$this->onRandomTick();
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
+		$this->onRandomTick($world, $pos);
 	}
 
 	private function hasAdjacentFlammableBlocks() : bool{
@@ -175,7 +177,7 @@ class Fire extends Flowable{
 			$ev = new BlockBurnEvent($block, $this);
 			$ev->call();
 			if(!$ev->isCancelled()){
-				$block->onIncinerate();
+				$block->onIncinerate($block->getPos()->getWorld(), $block->getPos());
 
 				if(mt_rand(0, $this->age + 9) < 5){ //TODO: check rain
 					$fire = clone $this;

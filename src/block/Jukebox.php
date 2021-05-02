@@ -30,6 +30,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\sound\RecordSound;
 use pocketmine\world\sound\RecordStopSound;
+use pocketmine\world\World;
 
 class Jukebox extends Opaque{
 	/** @var Record|null */
@@ -44,7 +45,7 @@ class Jukebox extends Opaque{
 		return 300;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
 			if($this->record !== null){
 				$this->ejectRecord();
@@ -54,7 +55,7 @@ class Jukebox extends Opaque{
 			}
 		}
 
-		$this->pos->getWorld()->setBlock($this->pos, $this);
+		$world->setBlock($blockPos, $this);
 
 		return true;
 	}
@@ -88,9 +89,9 @@ class Jukebox extends Opaque{
 		$this->getPos()->getWorld()->addSound($this->getPos(), new RecordStopSound());
 	}
 
-	public function onBreak(Item $item, ?Player $player = null) : bool{
+	public function onBreak(World $world, Vector3 $blockPos, Item $item, ?Player $player = null) : bool{
 		$this->stopSound();
-		return parent::onBreak($item, $player);
+		return parent::onBreak($world, $blockPos, $item, $player);
 	}
 
 	public function getDropsForCompatibleTool(Item $item) : array{

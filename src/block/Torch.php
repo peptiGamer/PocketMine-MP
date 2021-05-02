@@ -29,6 +29,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 class Torch extends Flowable{
 
@@ -67,12 +68,12 @@ class Torch extends Flowable{
 		return 14;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		$below = $this->getSide(Facing::DOWN);
 		$face = Facing::opposite($this->facing);
 
 		if($this->getSide($face)->isTransparent() and !($face === Facing::DOWN and ($below->getId() === BlockLegacyIds::FENCE or $below->getId() === BlockLegacyIds::COBBLESTONE_WALL))){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 

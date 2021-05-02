@@ -33,6 +33,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\sound\DoorSound;
+use pocketmine\world\World;
 
 class Door extends Transparent{
 	use HorizontalFacingTrait;
@@ -122,9 +123,9 @@ class Door extends Transparent{
 		return [AxisAlignedBB::one()->trim($this->open ? Facing::rotateY($this->facing, !$this->hingeRight) : $this->facing, 13 / 16)];
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::DOWN)->getId() === BlockLegacyIds::AIR){ //Replace with common break method
-			$this->pos->getWorld()->useBreakOn($this->pos); //this will delete both halves if they exist
+			$world->useBreakOn($pos); //this will delete both halves if they exist
 		}
 	}
 
@@ -157,17 +158,17 @@ class Door extends Transparent{
 		return false;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		$this->open = !$this->open;
 
 		$other = $this->getSide($this->top ? Facing::DOWN : Facing::UP);
 		if($other instanceof Door and $other->isSameType($this)){
 			$other->open = $this->open;
-			$this->pos->getWorld()->setBlock($other->pos, $other);
+			$world->setBlock($other->pos, $other);
 		}
 
-		$this->pos->getWorld()->setBlock($this->pos, $this);
-		$this->pos->getWorld()->addSound($this->pos, new DoorSound());
+		$world->setBlock($blockPos, $this);
+		$world->addSound($blockPos, new DoorSound());
 
 		return true;
 	}

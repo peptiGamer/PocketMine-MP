@@ -223,18 +223,18 @@ class Block{
 	/**
 	 * Do the actions needed so the block is broken with the Item
 	 */
-	public function onBreak(Item $item, ?Player $player = null) : bool{
-		if(($t = $this->pos->getWorld()->getTile($this->pos)) !== null){
+	public function onBreak(World $world, Vector3 $blockPos,Item $item, ?Player $player = null) : bool{
+		if(($t = $world->getTile($blockPos)) !== null){
 			$t->onBlockDestroyed();
 		}
-		$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::AIR());
+		$world->setBlock($blockPos, VanillaBlocks::AIR());
 		return true;
 	}
 
 	/**
 	 * Called when this block or a block immediately adjacent to it changes state.
 	 */
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 
 	}
 
@@ -249,21 +249,21 @@ class Block{
 	 * Called when this block is randomly updated due to chunk ticking.
 	 * WARNING: This will not be called if ticksRandomly() does not return true!
 	 */
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 
 	}
 
 	/**
 	 * Called when this block is updated by the delayed blockupdate scheduler in the world.
 	 */
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 
 	}
 
 	/**
 	 * Do actions when interacted by Item. Returns if it has done anything
 	 */
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		return false;
 	}
 
@@ -273,7 +273,7 @@ class Block{
 	 *
 	 * @return bool if an action took place, prevents starting to break the block if true.
 	 */
-	public function onAttack(Item $item, int $face, ?Player $player = null) : bool{
+	public function onAttack(World $world, Vector3 $blockPos, Item $item, int $face, ?Player $player = null) : bool{
 		return false;
 	}
 
@@ -467,7 +467,7 @@ class Block{
 	/**
 	 * Called when this block is burned away by being on fire.
 	 */
-	public function onIncinerate() : void{
+	public function onIncinerate(World $world, Vector3 $pos) : void{
 
 	}
 

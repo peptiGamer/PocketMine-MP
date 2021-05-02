@@ -30,6 +30,7 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 use function cos;
 use function max;
 use function round;
@@ -88,20 +89,20 @@ class DaylightSensor extends Transparent{
 		return [AxisAlignedBB::one()->trim(Facing::UP, 10 / 16)];
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		$this->inverted = !$this->inverted;
 		$this->signalStrength = $this->recalculateSignalStrength();
-		$this->pos->getWorld()->setBlock($this->pos, $this);
+		$world->setBlock($blockPos, $this);
 		return true;
 	}
 
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 		$signalStrength = $this->recalculateSignalStrength();
 		if($this->signalStrength !== $signalStrength){
 			$this->signalStrength = $signalStrength;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
+			$world->setBlock($pos, $this);
 		}
-		$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, 20);
+		$world->scheduleDelayedBlockUpdate($pos, 20);
 	}
 
 	private function recalculateSignalStrength() : int{

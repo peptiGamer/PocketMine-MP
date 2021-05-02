@@ -129,7 +129,7 @@ class Bed extends Transparent{
 		return null;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player !== null){
 			$other = $this->getOtherHalf();
 			$playerPos = $player->getPosition();
@@ -137,12 +137,12 @@ class Bed extends Transparent{
 				$player->sendMessage(TextFormat::GRAY . "This bed is incomplete");
 
 				return true;
-			}elseif($playerPos->distanceSquared($this->pos) > 4 and $playerPos->distanceSquared($other->pos) > 4){
+			}elseif($playerPos->distanceSquared($blockPos) > 4 and $playerPos->distanceSquared($other->pos) > 4){
 				$player->sendMessage(new TranslationContainer(TextFormat::GRAY . "%tile.bed.tooFar"));
 				return true;
 			}
 
-			$time = $this->pos->getWorld()->getTimeOfDay();
+			$time = $world->getTimeOfDay();
 
 			$isNight = ($time >= World::TIME_NIGHT and $time < World::TIME_SUNRISE);
 
@@ -167,10 +167,10 @@ class Bed extends Transparent{
 
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(($other = $this->getOtherHalf()) !== null and $other->occupied !== $this->occupied){
 			$this->occupied = $other->occupied;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
+			$world->setBlock($pos, $this);
 		}
 	}
 

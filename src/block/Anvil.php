@@ -35,6 +35,8 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class Anvil extends Transparent implements Fallable{
 	use FallableTrait;
@@ -82,9 +84,9 @@ class Anvil extends Transparent implements Fallable{
 		return [AxisAlignedBB::one()->squash(Facing::axis(Facing::rotateY($this->facing, false)), 1 / 8)];
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
-			$player->setCurrentWindow(new AnvilInventory($this->pos));
+			$player->setCurrentWindow(new AnvilInventory(Position::fromObject($blockPos, $world)));
 		}
 
 		return true;

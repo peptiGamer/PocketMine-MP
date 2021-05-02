@@ -31,6 +31,7 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 
 class Chest extends Transparent{
 	use FacesOppositePlacingPlayerTrait;
@@ -68,10 +69,10 @@ class Chest extends Transparent{
 		}
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
 
-			$chest = $this->pos->getWorld()->getTile($this->pos);
+			$chest = $world->getTile($blockPos);
 			if($chest instanceof TileChest){
 				if(
 					!$this->getSide(Facing::UP)->isTransparent() or

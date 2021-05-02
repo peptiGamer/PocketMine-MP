@@ -29,6 +29,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ToolTier;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 use function array_key_exists;
 
 class BrewingStand extends Transparent{
@@ -102,9 +103,9 @@ class BrewingStand extends Transparent{
 		return $this;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
-			$stand = $this->pos->getWorld()->getTile($this->pos);
+			$stand = $world->getTile($this->pos);
 			if($stand instanceof TileBrewingStand and $stand->canOpenWith($item->getCustomName())){
 				$player->setCurrentWindow($stand->getInventory());
 			}
@@ -113,7 +114,7 @@ class BrewingStand extends Transparent{
 		return true;
 	}
 
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 		//TODO
 	}
 }

@@ -792,7 +792,7 @@ class World implements ChunkManager{
 				continue;
 			}
 			$block = $this->getBlock($vec);
-			$block->onScheduledUpdate();
+			$block->onScheduledUpdate($this, $vec);
 		}
 
 		//Normal updates
@@ -812,7 +812,7 @@ class World implements ChunkManager{
 				foreach($this->getNearbyEntities(AxisAlignedBB::one()->offset($x, $y, $z)) as $entity){
 					$entity->onNearbyBlockChange();
 				}
-				$block->onNearbyBlockChange();
+				$block->onNearbyBlockChange($this, $block->getPos());
 			}
 			unset($this->neighbourBlockUpdateQueueIndex[$index]);
 		}
@@ -1069,8 +1069,7 @@ class World implements ChunkManager{
 						if(isset($this->randomTickBlocks[$state])){
 							/** @var Block $block */
 							$block = BlockFactory::getInstance()->fromFullBlock($state);
-							$block->position($this, $chunkX * 16 + $x, ($Y << 4) + $y, $chunkZ * 16 + $z);
-							$block->onRandomTick();
+							$block->onRandomTick($this, new Vector3($chunkX * 16 + $x, ($Y << 4) + $y, $chunkZ * 16 + $z));
 						}
 					}
 				}
@@ -1701,7 +1700,7 @@ class World implements ChunkManager{
 			$this->addParticle($target->getPos()->add(0.5, 0.5, 0.5), new DestroyBlockParticle($target));
 		}
 
-		$target->onBreak($item, $player);
+		$target->onBreak($this, $target->getPos(), $item, $player);
 
 		$tile = $this->getTile($target->getPos());
 		if($tile !== null){
@@ -1745,7 +1744,7 @@ class World implements ChunkManager{
 
 			$ev->call();
 			if(!$ev->isCancelled()){
-				if((!$player->isSneaking() or $item->isNull()) and $blockClicked->onInteract($item, $face, $clickVector, $player)){
+				if((!$player->isSneaking() or $item->isNull()) and $blockClicked->onInteract($this, $vector, $item, $face, $clickVector, $player)){
 					return true;
 				}
 
@@ -1756,7 +1755,7 @@ class World implements ChunkManager{
 			}else{
 				return false;
 			}
-		}elseif($blockClicked->onInteract($item, $face, $clickVector, $player)){
+		}elseif($blockClicked->onInteract($this, $vector, $item, $face, $clickVector, $player)){
 			return true;
 		}
 

@@ -35,6 +35,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function mt_rand;
 
 class CocoaBlock extends Transparent{
@@ -98,10 +99,10 @@ class CocoaBlock extends Transparent{
 		return false;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($this->age < 2 and $item instanceof Fertilizer){
 			$this->age++;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
+			$world->setBlock($blockPos, $this);
 
 			$item->pop();
 
@@ -111,9 +112,9 @@ class CocoaBlock extends Transparent{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->canAttachTo($this->getSide(Facing::opposite($this->facing)))){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 
@@ -121,10 +122,10 @@ class CocoaBlock extends Transparent{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if($this->age < 2 and mt_rand(1, 5) === 1){
 			$this->age++;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
+			$world->setBlock($pos, $this);
 		}
 	}
 

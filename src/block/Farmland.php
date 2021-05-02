@@ -27,6 +27,8 @@ use pocketmine\block\utils\BlockDataSerializer;
 use pocketmine\item\Item;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Facing;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 
 class Farmland extends Transparent{
 
@@ -67,9 +69,9 @@ class Farmland extends Transparent{
 		return [AxisAlignedBB::one()]; //TODO: this should be trimmed at the top by 1/16, but MCPE currently treats them as a full block (https://bugs.mojang.com/browse/MCPE-12109)
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::UP)->isSolid()){
-			$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::DIRT());
+			$world->setBlock($pos, VanillaBlocks::DIRT());
 		}
 	}
 
@@ -77,17 +79,17 @@ class Farmland extends Transparent{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if(!$this->canHydrate()){
 			if($this->wetness > 0){
 				$this->wetness--;
-				$this->pos->getWorld()->setBlock($this->pos, $this, false);
+				$world->setBlock($pos, $this, false);
 			}else{
-				$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::DIRT());
+				$world->setBlock($pos, VanillaBlocks::DIRT());
 			}
 		}elseif($this->wetness < 7){
 			$this->wetness = 7;
-			$this->pos->getWorld()->setBlock($this->pos, $this, false);
+			$world->setBlock($pos, $this, false);
 		}
 	}
 

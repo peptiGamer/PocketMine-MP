@@ -33,6 +33,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\Random;
 use pocketmine\world\generator\object\TallGrass as TallGrassObject;
+use pocketmine\world\World;
 use function mt_rand;
 
 class Grass extends Opaque{
@@ -55,28 +56,28 @@ class Grass extends Opaque{
 		return true;
 	}
 
-	public function onRandomTick() : void{
-		$lightAbove = $this->pos->getWorld()->getFullLightAt($this->pos->x, $this->pos->y + 1, $this->pos->z);
-		if($lightAbove < 4 and $this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y + 1, $this->pos->z)->getLightFilter() >= 2){
+	public function onRandomTick(World $world, Vector3 $pos) : void{
+		$lightAbove = $world->getFullLightAt($pos->x, $pos->y + 1, $pos->z);
+		if($lightAbove < 4 and $world->getBlockAt($pos->x, $pos->y + 1, $pos->z)->getLightFilter() >= 2){
 			//grass dies
 			$ev = new BlockSpreadEvent($this, $this, VanillaBlocks::DIRT());
 			$ev->call();
 			if(!$ev->isCancelled()){
-				$this->pos->getWorld()->setBlock($this->pos, $ev->getNewState(), false);
+				$world->setBlock($pos, $ev->getNewState(), false);
 			}
 		}elseif($lightAbove >= 9){
 			//try grass spread
 			for($i = 0; $i < 4; ++$i){
-				$x = mt_rand($this->pos->x - 1, $this->pos->x + 1);
-				$y = mt_rand($this->pos->y - 3, $this->pos->y + 1);
-				$z = mt_rand($this->pos->z - 1, $this->pos->z + 1);
+				$x = mt_rand($pos->x - 1, $pos->x + 1);
+				$y = mt_rand($pos->y - 3, $pos->y + 1);
+				$z = mt_rand($pos->z - 1, $pos->z + 1);
 
-				$b = $this->pos->getWorld()->getBlockAt($x, $y, $z);
+				$b = $world->getBlockAt($x, $y, $z);
 				if(
 					!($b instanceof Dirt) or
 					$b instanceof CoarseDirt or
-					$this->pos->getWorld()->getFullLightAt($x, $y + 1, $z) < 4 or
-					$this->pos->getWorld()->getBlockAt($x, $y + 1, $z)->getLightFilter() >= 2
+					$world->getFullLightAt($x, $y + 1, $z) < 4 or
+					$world->getBlockAt($x, $y + 1, $z)->getLightFilter() >= 2
 				){
 					continue;
 				}
@@ -84,29 +85,29 @@ class Grass extends Opaque{
 				$ev = new BlockSpreadEvent($b, $this, VanillaBlocks::GRASS());
 				$ev->call();
 				if(!$ev->isCancelled()){
-					$this->pos->getWorld()->setBlock($b->pos, $ev->getNewState(), false);
+					$world->setBlock($b->pos, $ev->getNewState(), false);
 				}
 			}
 		}
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($face !== Facing::UP){
 			return false;
 		}
 		if($item instanceof Fertilizer){
 			$item->pop();
-			TallGrassObject::growGrass($this->pos->getWorld(), $this->pos, new Random(mt_rand()), 8, 2);
+			TallGrassObject::growGrass($world, $blockPos, new Random(mt_rand()), 8, 2);
 
 			return true;
 		}elseif($item instanceof Hoe){
 			$item->applyDamage(1);
-			$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::FARMLAND());
+			$world->setBlock($blockPos, VanillaBlocks::FARMLAND());
 
 			return true;
 		}elseif($item instanceof Shovel and $this->getSide(Facing::UP)->getId() === BlockLegacyIds::AIR){
 			$item->applyDamage(1);
-			$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::GRASS_PATH());
+			$world->setBlock($blockPos, VanillaBlocks::GRASS_PATH());
 
 			return true;
 		}

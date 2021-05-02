@@ -24,6 +24,8 @@ declare(strict_types=1);
 namespace pocketmine\block;
 
 use pocketmine\block\utils\BlockDataSerializer;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 use function mt_rand;
 
 class FrostedIce extends Ice{
@@ -58,17 +60,17 @@ class FrostedIce extends Ice{
 		return $this;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->checkAdjacentBlocks(2)){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}else{
-			$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, mt_rand(20, 40));
+			$world->scheduleDelayedBlockUpdate($pos, mt_rand(20, 40));
 		}
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if((!$this->checkAdjacentBlocks(4) or mt_rand(0, 2) === 0) and
-			$this->pos->getWorld()->getHighestAdjacentFullLightAt($this->pos->x, $this->pos->y, $this->pos->z) >= 12 - $this->age){
+			$world->getHighestAdjacentFullLightAt($pos->x, $pos->y, $pos->z) >= 12 - $this->age){
 			if($this->tryMelt()){
 				foreach($this->getAllSides() as $block){
 					if($block instanceof FrostedIce){
@@ -77,12 +79,12 @@ class FrostedIce extends Ice{
 				}
 			}
 		}else{
-			$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, mt_rand(20, 40));
+			$world->scheduleDelayedBlockUpdate($pos, mt_rand(20, 40));
 		}
 	}
 
-	public function onScheduledUpdate() : void{
-		$this->onRandomTick();
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
+		$this->onRandomTick($world, $pos);
 	}
 
 	private function checkAdjacentBlocks(int $requirement) : bool{

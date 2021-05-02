@@ -25,6 +25,8 @@ namespace pocketmine\block;
 
 use pocketmine\block\utils\CoralType;
 use pocketmine\item\Item;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 
 abstract class BaseCoral extends Transparent{
 
@@ -46,12 +48,10 @@ abstract class BaseCoral extends Transparent{
 		return $this;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->dead){
-			$world = $this->pos->getWorld();
-
 			$hasWater = false;
-			foreach($this->pos->sides() as $vector3){
+			foreach($pos->sides() as $vector3){
 				if($world->getBlock($vector3) instanceof Water){
 					$hasWater = true;
 					break;
@@ -60,7 +60,7 @@ abstract class BaseCoral extends Transparent{
 
 			//TODO: check water inside the block itself (not supported on the API yet)
 			if(!$hasWater){
-				$world->setBlock($this->pos, $this->setDead(true));
+				$world->setBlock($pos, $this->setDead(true));
 			}
 		}
 	}

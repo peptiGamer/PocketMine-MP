@@ -35,6 +35,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\Random;
 use pocketmine\world\sound\IgniteSound;
+use pocketmine\world\World;
 use function cos;
 use function sin;
 use const M_PI;
@@ -80,15 +81,15 @@ class TNT extends Opaque{
 		return $this;
 	}
 
-	public function onBreak(Item $item, ?Player $player = null) : bool{
+	public function onBreak(World $world, Vector3 $blockPos, Item $item, ?Player $player = null) : bool{
 		if($this->unstable){
 			$this->ignite();
 			return true;
 		}
-		return parent::onBreak($item, $player);
+		return parent::onBreak($world, $blockPos, $item, $player);
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($item instanceof FlintSteel or $item->hasEnchantment(VanillaEnchantments::FIRE_ASPECT())){
 			if($item instanceof Durable){
 				$item->applyDamage(1);
@@ -113,11 +114,13 @@ class TNT extends Opaque{
 	}
 
 	public function ignite(int $fuse = 80) : void{
-		$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::AIR());
+		$pos = $this->pos;
+		$world = $pos->getWorld();
+		$world->setBlock($pos, VanillaBlocks::AIR());
 
 		$mot = (new Random())->nextSignedFloat() * M_PI * 2;
 
-		$tnt = new PrimedTNT(Location::fromObject($this->pos->add(0.5, 0, 0.5), $this->pos->getWorld()));
+		$tnt = new PrimedTNT(Location::fromObject($pos->add(0.5, 0, 0.5), $world));
 		$tnt->setFuse($fuse);
 		$tnt->setWorksUnderwater($this->worksUnderwater);
 		$tnt->setMotion(new Vector3(-sin($mot) * 0.02, 0.2, -cos($mot) * 0.02));
@@ -134,7 +137,7 @@ class TNT extends Opaque{
 		return 100;
 	}
 
-	public function onIncinerate() : void{
+	public function onIncinerate(World $world, Vector3 $pos) : void{
 		$this->ignite();
 	}
 }

@@ -268,22 +268,22 @@ abstract class Liquid extends Transparent{
 		return 1;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->checkForHarden()){
-			$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, $this->tickRate());
+			$world->scheduleDelayedBlockUpdate($pos, $this->tickRate());
 		}
 	}
 
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 		$multiplier = $this->getFlowDecayPerBlock();
 
 		if(!$this->isSource()){
 			$smallestFlowDecay = -100;
 			$this->adjacentSources = 0;
-			$smallestFlowDecay = $this->getSmallestFlowDecay($this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y, $this->pos->z - 1), $smallestFlowDecay);
-			$smallestFlowDecay = $this->getSmallestFlowDecay($this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y, $this->pos->z + 1), $smallestFlowDecay);
-			$smallestFlowDecay = $this->getSmallestFlowDecay($this->pos->getWorld()->getBlockAt($this->pos->x - 1, $this->pos->y, $this->pos->z), $smallestFlowDecay);
-			$smallestFlowDecay = $this->getSmallestFlowDecay($this->pos->getWorld()->getBlockAt($this->pos->x + 1, $this->pos->y, $this->pos->z), $smallestFlowDecay);
+			$smallestFlowDecay = $this->getSmallestFlowDecay($world->getBlockAt($pos->x, $pos->y, $pos->z - 1), $smallestFlowDecay);
+			$smallestFlowDecay = $this->getSmallestFlowDecay($world->getBlockAt($pos->x, $pos->y, $pos->z + 1), $smallestFlowDecay);
+			$smallestFlowDecay = $this->getSmallestFlowDecay($world->getBlockAt($pos->x - 1, $pos->y, $pos->z), $smallestFlowDecay);
+			$smallestFlowDecay = $this->getSmallestFlowDecay($world->getBlockAt($pos->x + 1, $pos->y, $pos->z), $smallestFlowDecay);
 
 			$newDecay = $smallestFlowDecay + $multiplier;
 			$falling = false;
@@ -292,12 +292,12 @@ abstract class Liquid extends Transparent{
 				$newDecay = -1;
 			}
 
-			if($this->getEffectiveFlowDecay($this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y + 1, $this->pos->z)) >= 0){
+			if($this->getEffectiveFlowDecay($world->getBlockAt($pos->x, $pos->y + 1, $pos->z)) >= 0){
 				$falling = true;
 			}
 
 			if($this->adjacentSources >= 2 and $this instanceof Water){
-				$bottomBlock = $this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y - 1, $this->pos->z);
+				$bottomBlock = $world->getBlockAt($pos->x, $pos->y - 1, $pos->z);
 				if($bottomBlock->isSolid() or ($bottomBlock instanceof Water and $bottomBlock->isSource())){
 					$newDecay = 0;
 					$falling = false;
@@ -306,17 +306,17 @@ abstract class Liquid extends Transparent{
 
 			if($falling !== $this->falling or (!$falling and $newDecay !== $this->decay)){
 				if(!$falling and $newDecay < 0){
-					$this->pos->getWorld()->setBlock($this->pos, VanillaBlocks::AIR());
+					$world->setBlock($pos, VanillaBlocks::AIR());
 					return;
 				}
 
 				$this->falling = $falling;
 				$this->decay = $falling ? 0 : $newDecay;
-				$this->pos->getWorld()->setBlock($this->pos, $this); //local block update will cause an update to be scheduled
+				$world->setBlock($pos, $this); //local block update will cause an update to be scheduled
 			}
 		}
 
-		$bottomBlock = $this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y - 1, $this->pos->z);
+		$bottomBlock = $world->getBlockAt($pos->x, $pos->y - 1, $pos->z);
 
 		$this->flowIntoBlock($bottomBlock, 0, true);
 
@@ -331,19 +331,19 @@ abstract class Liquid extends Transparent{
 				$flags = $this->getOptimalFlowDirections();
 
 				if($flags[0]){
-					$this->flowIntoBlock($this->pos->getWorld()->getBlockAt($this->pos->x - 1, $this->pos->y, $this->pos->z), $adjacentDecay, false);
+					$this->flowIntoBlock($world->getBlockAt($pos->x - 1, $pos->y, $pos->z), $adjacentDecay, false);
 				}
 
 				if($flags[1]){
-					$this->flowIntoBlock($this->pos->getWorld()->getBlockAt($this->pos->x + 1, $this->pos->y, $this->pos->z), $adjacentDecay, false);
+					$this->flowIntoBlock($world->getBlockAt($pos->x + 1, $pos->y, $pos->z), $adjacentDecay, false);
 				}
 
 				if($flags[2]){
-					$this->flowIntoBlock($this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y, $this->pos->z - 1), $adjacentDecay, false);
+					$this->flowIntoBlock($world->getBlockAt($pos->x, $pos->y, $pos->z - 1), $adjacentDecay, false);
 				}
 
 				if($flags[3]){
-					$this->flowIntoBlock($this->pos->getWorld()->getBlockAt($this->pos->x, $this->pos->y, $this->pos->z + 1), $adjacentDecay, false);
+					$this->flowIntoBlock($world->getBlockAt($pos->x, $pos->y, $pos->z + 1), $adjacentDecay, false);
 				}
 			}
 		}

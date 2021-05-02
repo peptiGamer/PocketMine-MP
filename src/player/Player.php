@@ -1551,7 +1551,7 @@ class Player extends Human implements CommandSender, ChunkListener, IPlayer{
 			return false;
 		}
 		$this->broadcastAnimation(new ArmSwingAnimation($this), $this->getViewers());
-		if($target->onAttack($this->inventory->getItemInHand(), $face, $this)){
+		if($target->onAttack($this->getWorld(), $pos, $this->inventory->getItemInHand(), $face, $this)){
 			return true;
 		}
 

@@ -29,6 +29,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function array_map;
 use function array_reverse;
 use function array_search;
@@ -285,13 +286,13 @@ abstract class BaseRail extends Flowable{
 		$this->connections = $connections;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::DOWN)->isTransparent()){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}else{
 			foreach($this->connections as $connection){
 				if(($connection & self::FLAG_ASCEND) !== 0 and $this->getSide($connection & ~self::FLAG_ASCEND)->isTransparent()){
-					$this->pos->getWorld()->useBreakOn($this->pos);
+					$world->useBreakOn($pos);
 					break;
 				}
 			}

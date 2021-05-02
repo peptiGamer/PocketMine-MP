@@ -30,6 +30,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function array_intersect_key;
 use function count;
 
@@ -130,7 +131,7 @@ class Vine extends Flowable{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		$changed = false;
 
 		$up = $this->getSide(Facing::UP);
@@ -146,9 +147,9 @@ class Vine extends Flowable{
 
 		if($changed){
 			if(count($this->faces) === 0){
-				$this->pos->getWorld()->useBreakOn($this->pos);
+				$world->useBreakOn($pos);
 			}else{
-				$this->pos->getWorld()->setBlock($this->pos, $this);
+				$world->setBlock($pos, $this);
 			}
 		}
 	}
@@ -157,7 +158,7 @@ class Vine extends Flowable{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		//TODO: vine growth
 	}
 

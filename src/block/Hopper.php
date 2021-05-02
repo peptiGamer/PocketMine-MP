@@ -33,6 +33,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 class Hopper extends Transparent{
 	use PoweredByRedstoneTrait;
@@ -85,9 +86,9 @@ class Hopper extends Transparent{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player !== null){
-			$tile = $this->pos->getWorld()->getTile($this->pos);
+			$tile = $world->getTile($blockPos);
 			if($tile instanceof TileHopper){ //TODO: find a way to have inventories open on click without this boilerplate in every block
 				$player->setCurrentWindow($tile->getInventory());
 			}
@@ -96,7 +97,7 @@ class Hopper extends Transparent{
 		return false;
 	}
 
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 		//TODO
 	}
 

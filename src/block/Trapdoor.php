@@ -32,6 +32,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\sound\DoorSound;
+use pocketmine\world\World;
 
 class Trapdoor extends Transparent{
 	use HorizontalFacingTrait;
@@ -91,10 +92,10 @@ class Trapdoor extends Transparent{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		$this->open = !$this->open;
-		$this->pos->getWorld()->setBlock($this->pos, $this);
-		$this->pos->getWorld()->addSound($this->pos, new DoorSound());
+		$world->setBlock($blockPos, $this);
+		$world->addSound($blockPos, new DoorSound());
 		return true;
 	}
 }

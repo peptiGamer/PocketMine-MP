@@ -30,6 +30,8 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class EnchantingTable extends Transparent{
 
@@ -44,11 +46,11 @@ class EnchantingTable extends Transparent{
 		return [AxisAlignedBB::one()->trim(Facing::UP, 0.25)];
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($player instanceof Player){
 			//TODO lock
 
-			$player->setCurrentWindow(new EnchantInventory($this->pos));
+			$player->setCurrentWindow(new EnchantInventory(Position::fromObject($blockPos, $world)));
 		}
 
 		return true;

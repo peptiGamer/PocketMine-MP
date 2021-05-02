@@ -52,12 +52,12 @@ class DragonEgg extends Transparent implements Fallable{
 		return null;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		$this->teleport();
 		return true;
 	}
 
-	public function onAttack(Item $item, int $face, ?Player $player = null) : bool{
+	public function onAttack(World $world, Vector3 $blockPos, Item $item, int $face, ?Player $player = null) : bool{
 		if($player !== null && !$player->getGamemode()->equals(GameMode::CREATIVE())){
 			$this->teleport();
 			return true;

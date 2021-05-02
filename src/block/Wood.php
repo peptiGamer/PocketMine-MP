@@ -27,6 +27,7 @@ use pocketmine\block\utils\TreeType;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 
 class Wood extends Opaque{
 
@@ -62,7 +63,7 @@ class Wood extends Opaque{
 		return 5;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if(!$this->stripped && ($item->getBlockToolType() & BlockToolType::AXE) !== 0){
 			//TODO: strip logs; can't implement this yet because of legacy limitations :(
 			return true;

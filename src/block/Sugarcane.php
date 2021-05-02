@@ -31,6 +31,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 class Sugarcane extends Flowable{
 
@@ -85,7 +86,7 @@ class Sugarcane extends Flowable{
 		return $this;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($item instanceof Fertilizer){
 			if(!$this->getSide(Facing::DOWN)->isSameType($this)){
 				$this->grow();
@@ -99,10 +100,10 @@ class Sugarcane extends Flowable{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		$down = $this->getSide(Facing::DOWN);
 		if($down->isTransparent() and !$down->isSameType($this)){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 
@@ -110,13 +111,13 @@ class Sugarcane extends Flowable{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if(!$this->getSide(Facing::DOWN)->isSameType($this)){
 			if($this->age === 15){
 				$this->grow();
 			}else{
 				++$this->age;
-				$this->pos->getWorld()->setBlock($this->pos, $this);
+				$world->setBlock($pos, $this);
 			}
 		}
 	}

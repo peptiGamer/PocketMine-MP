@@ -25,6 +25,8 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\ToolTier;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 use function mt_rand;
 
 class MonsterSpawner extends Transparent{
@@ -41,7 +43,7 @@ class MonsterSpawner extends Transparent{
 		return mt_rand(15, 43);
 	}
 
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 		//TODO
 	}
 }

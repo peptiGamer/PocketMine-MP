@@ -28,6 +28,8 @@ use pocketmine\block\utils\DyeColor;
 use pocketmine\block\utils\Fallable;
 use pocketmine\block\utils\FallableTrait;
 use pocketmine\math\Facing;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 
 class ConcretePowder extends Opaque implements Fallable{
 	use ColorInMetadataTrait;
@@ -40,11 +42,11 @@ class ConcretePowder extends Opaque implements Fallable{
 		parent::__construct($idInfo, $name, $breakInfo ?? new BlockBreakInfo(0.5, BlockToolType::SHOVEL));
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(($block = $this->checkAdjacentWater()) !== null){
-			$this->pos->getWorld()->setBlock($this->pos, $block);
+			$world->setBlock($pos, $block);
 		}else{
-			$this->startFalling();
+			$this->startFalling($world, $pos);
 		}
 	}
 

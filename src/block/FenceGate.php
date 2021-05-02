@@ -32,6 +32,7 @@ use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\sound\DoorSound;
+use pocketmine\world\World;
 
 class FenceGate extends Transparent{
 	use HorizontalFacingTrait;
@@ -101,15 +102,15 @@ class FenceGate extends Transparent{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		$inWall = $this->checkInWall();
 		if($inWall !== $this->inWall){
 			$this->inWall = $inWall;
-			$this->pos->getWorld()->setBlock($this->pos, $this);
+			$world->setBlock($pos, $this);
 		}
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		$this->open = !$this->open;
 		if($this->open and $player !== null){
 			$playerFacing = $player->getHorizontalFacing();
@@ -118,8 +119,8 @@ class FenceGate extends Transparent{
 			}
 		}
 
-		$this->pos->getWorld()->setBlock($this->pos, $this);
-		$this->pos->getWorld()->addSound($this->pos, new DoorSound());
+		$world->setBlock($blockPos, $this);
+		$world->addSound($blockPos, new DoorSound());
 		return true;
 	}
 

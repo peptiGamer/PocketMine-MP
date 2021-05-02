@@ -27,6 +27,7 @@ use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 
 final class Coral extends BaseCoral{
 
@@ -49,12 +50,11 @@ final class Coral extends BaseCoral{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onNearbyBlockChange() : void{
-		$world = $this->pos->getWorld();
-		if(!$world->getBlock($this->pos->down())->isSolid()){
-			$world->useBreakOn($this->pos);
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
+		if(!$world->getBlock($pos->down())->isSolid()){
+			$world->useBreakOn($pos);
 		}else{
-			parent::onNearbyBlockChange();
+			parent::onNearbyBlockChange($world, $pos);
 		}
 	}
 }

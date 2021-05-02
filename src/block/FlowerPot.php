@@ -30,6 +30,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function assert;
 
 class FlowerPot extends Flowable{
@@ -122,13 +123,13 @@ class FlowerPot extends Flowable{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->getSide(Facing::DOWN)->isTransparent()){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		$plant = $item->getBlock();
 		if(!$this->canAddPlant($plant)){
 			return false;
@@ -136,7 +137,7 @@ class FlowerPot extends Flowable{
 
 		$this->setPlant($plant);
 		$item->pop();
-		$this->pos->getWorld()->setBlock($this->pos, $this);
+		$world->setBlock($blockPos, $this);
 
 		return true;
 	}

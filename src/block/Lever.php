@@ -32,6 +32,7 @@ use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\sound\RedstonePowerOffSound;
 use pocketmine\world\sound\RedstonePowerOnSound;
+use pocketmine\world\World;
 
 class Lever extends Flowable{
 	protected const BOTTOM = 0;
@@ -98,7 +99,7 @@ class Lever extends Flowable{
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if($this->leverPos === self::BOTTOM){
 			$face = Facing::UP;
 		}elseif($this->leverPos === self::TOP){
@@ -108,15 +109,15 @@ class Lever extends Flowable{
 		}
 
 		if(!$this->getSide($face)->isSolid()){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		$this->powered = !$this->powered;
-		$this->pos->getWorld()->setBlock($this->pos, $this);
-		$this->pos->getWorld()->addSound(
-			$this->pos->add(0.5, 0.5, 0.5),
+		$world->setBlock($blockPos, $this);
+		$world->addSound(
+			$blockPos->add(0.5, 0.5, 0.5),
 			$this->powered ? new RedstonePowerOnSound() : new RedstonePowerOffSound()
 		);
 		return true;

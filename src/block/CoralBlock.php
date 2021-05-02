@@ -27,6 +27,8 @@ use pocketmine\block\utils\CoralType;
 use pocketmine\block\utils\InvalidBlockStateException;
 use pocketmine\data\bedrock\CoralTypeIdMap;
 use pocketmine\item\Item;
+use pocketmine\math\Vector3;
+use pocketmine\world\World;
 use function mt_rand;
 
 final class CoralBlock extends Opaque{
@@ -79,25 +81,23 @@ final class CoralBlock extends Opaque{
 		return $this;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->dead){
-			$this->pos->getWorld()->scheduleDelayedBlockUpdate($this->pos, mt_rand(40, 200));
+			$world->scheduleDelayedBlockUpdate($pos, mt_rand(40, 200));
 		}
 	}
 
-	public function onScheduledUpdate() : void{
+	public function onScheduledUpdate(World $world, Vector3 $pos) : void{
 		if(!$this->dead){
-			$world = $this->pos->getWorld();
-
 			$hasWater = false;
-			foreach($this->pos->sides() as $vector3){
+			foreach($pos->sides() as $vector3){
 				if($world->getBlock($vector3) instanceof Water){
 					$hasWater = true;
 					break;
 				}
 			}
 			if(!$hasWater){
-				$world->setBlock($this->pos, $this->setDead(true));
+				$world->setBlock($pos, $this->setDead(true));
 			}
 		}
 	}

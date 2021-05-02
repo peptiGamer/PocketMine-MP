@@ -32,6 +32,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
+use pocketmine\world\World;
 use function count;
 use function gmp_add;
 use function gmp_and;
@@ -144,7 +145,7 @@ class Bamboo extends Transparent{
 		return $top;
 	}
 
-	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
+	public function onInteract(World $world, Vector3 $blockPos, Item $item, int $face, Vector3 $clickVector, ?Player $player = null) : bool{
 		if($item instanceof Fertilizer){
 			$top = $this->seekToTop();
 			if($top->grow(self::getMaxHeight($top->pos->getFloorX(), $top->pos->getFloorZ()), mt_rand(1, 2))){
@@ -160,10 +161,10 @@ class Bamboo extends Transparent{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
-		$below = $this->pos->getWorld()->getBlock($this->pos->down());
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
+		$below = $world->getBlock($pos->down());
 		if(!$this->canBeSupportedBy($below) and !$below->isSameType($this)){
-			$this->pos->getWorld()->useBreakOn($this->pos);
+			$world->useBreakOn($pos);
 		}
 	}
 
@@ -220,16 +221,15 @@ class Bamboo extends Transparent{
 		return true;
 	}
 
-	public function onRandomTick() : void{
-		$world = $this->pos->getWorld();
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if($this->ready){
 			$this->ready = false;
-			if($world->getFullLight($this->pos) < 9 || !$this->grow(self::getMaxHeight($this->pos->getFloorX(), $this->pos->getFloorZ()), 1)){
-				$world->setBlock($this->pos, $this);
+			if($world->getFullLight($pos) < 9 || !$this->grow(self::getMaxHeight($pos->getFloorX(), $pos->getFloorZ()), 1)){
+				$world->setBlock($pos, $this);
 			}
-		}elseif($world->getBlock($this->pos->up())->canBeReplaced()){
+		}elseif($world->getBlock($pos->up())->canBeReplaced()){
 			$this->ready = true;
-			$world->setBlock($this->pos, $this);
+			$world->setBlock($pos, $this);
 		}
 	}
 }

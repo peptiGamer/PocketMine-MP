@@ -110,10 +110,10 @@ class Leaves extends Transparent{
 		return false;
 	}
 
-	public function onNearbyBlockChange() : void{
+	public function onNearbyBlockChange(World $world, Vector3 $pos) : void{
 		if(!$this->noDecay and !$this->checkDecay){
 			$this->checkDecay = true;
-			$this->pos->getWorld()->setBlock($this->pos, $this, false);
+			$world->setBlock($pos, $this, false);
 		}
 	}
 
@@ -121,15 +121,15 @@ class Leaves extends Transparent{
 		return true;
 	}
 
-	public function onRandomTick() : void{
+	public function onRandomTick(World $world, Vector3 $pos) : void{
 		if(!$this->noDecay and $this->checkDecay){
 			$ev = new LeavesDecayEvent($this);
 			$ev->call();
-			if($ev->isCancelled() or $this->findLog($this->pos)){
+			if($ev->isCancelled() or $this->findLog($pos)){
 				$this->checkDecay = false;
-				$this->pos->getWorld()->setBlock($this->pos, $this, false);
+				$world->setBlock($pos, $this, false);
 			}else{
-				$this->pos->getWorld()->useBreakOn($this->pos);
+				$world->useBreakOn($pos);
 			}
 		}
 	}
