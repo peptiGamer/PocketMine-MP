@@ -25,7 +25,6 @@ namespace pocketmine\utils;
 
 use function function_exists;
 use function pcntl_signal;
-use function pcntl_signal_dispatch;
 use function sapi_windows_set_ctrl_handler;
 use const PHP_WINDOWS_EVENT_CTRL_BREAK;
 use const PHP_WINDOWS_EVENT_CTRL_C;
