@@ -93,6 +93,7 @@ use pocketmine\utils\Internet;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\Process;
 use pocketmine\utils\Promise;
+use pocketmine\utils\SignalHandler;
 use pocketmine\utils\Terminal;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Utils;
@@ -282,6 +283,8 @@ class Server{
 
 	/** @var Player[] */
 	private $playerList = [];
+
+	private SignalHandler $signalHandler;
 
 	/**
 	 * @var CommandSender[][]
@@ -808,6 +811,11 @@ class Server{
 		$this->tickSleeper = new SleeperHandler();
 		$this->autoloader = $autoloader;
 		$this->logger = $logger;
+
+		$this->signalHandler = new SignalHandler(function() : void{
+			$this->logger->info("Received signal interrupt, stopping the server");
+			$this->shutdown();
+		});
 
 		try{
 			if(!file_exists($dataPath . "worlds/")){
@@ -1373,7 +1381,10 @@ class Server{
 	 * Shuts the server down correctly
 	 */
 	public function shutdown() : void{
-		$this->isRunning = false;
+		if($this->isRunning){
+			$this->isRunning = false;
+			$this->signalHandler->unregister();
+		}
 	}
 
 	public function forceShutdown() : void{
