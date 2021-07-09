@@ -35,6 +35,7 @@ interface EntityIds{
 	public const SQUID = 17;
 	public const RABBIT = 18;
 	public const BAT = 19;
+	public const BEE = 122;
 	public const IRON_GOLEM = 20;
 	public const SNOW_GOLEM = 21;
 	public const OCELOT = 22;
